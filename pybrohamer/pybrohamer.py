@@ -104,7 +104,8 @@ def get_time_of_beaten_length(distance: float, time: float) -> float:
 
 
 class BrohamerPastPerformance:
-    def __init__(self, sfpp: SingleFilePastPerformance):
+    def __init__(self, name: str, sfpp: SingleFilePastPerformance):
+        self.name = name
         self.distance = round(abs(sfpp.distance) / 220.0, 2)
         self.surface = sfpp.surface
         self.all_weather = True if sfpp.all_weather_surface_flag == 'A' else False
@@ -214,9 +215,9 @@ class BrohamerHorse:
         self.past_performances: list[BrohamerPastPerformance] = []
         if sfh.past_performances:
             for pp in sfh.past_performances:
-                if not pp.track_code:
+                if not pp.track_code or int(pp.date[:4]) < 2025:
                     continue
-                self.past_performances.append(BrohamerPastPerformance(pp))
+                self.past_performances.append(BrohamerPastPerformance(self.name, pp))
 
     def __str__(self):
         ret = ''
