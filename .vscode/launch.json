@@ -1,0 +1,20 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Main",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": [
+                "C:\\Users\\mathe\\OneDrive\\Documents\\horses\\gulfstream\\pps\\2025\\data\\GPX1004.DRF",
+                "C:\\Users\\mathe\\OneDrive\\Documents\\horses\\gulfstream\\pps\\2025\\gpx1004.xlsx",
+                "--scratches=C. S. Vivace,Red River Rebel,Tap Gold,Rough Draft,Sultan The Great,Tape Runner,Flat Cap,Drill's Valentine,Smart Jenny,Megan Makin Money,Red Hot Spark,Denver's Alley,Lita,Tee At One,Dominican Pioneer"
+            ]
+        },
+    ]
+}
