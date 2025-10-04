@@ -2,6 +2,7 @@
 
 
 # import csv
+from dataclasses import dataclass
 from enum import Enum
 import math
 import os
@@ -123,7 +124,7 @@ class BrohamerPastPerformance:
         self.bl1 = sfpp.first_call_beaten_lengths
         self.bl2 = sfpp.second_call_beaten_lengths
         self.bl3 = sfpp.finish_beaten_lengths
-        self.winner = 1 if self.finish_position == 1 else 0
+        self.winner = 1 if self.finish_position == '1' else 0
 
         if abs(self.average_variant - self.track_variant) > 1:  # type: ignore
             if self.average_variant - self.track_variant > 4:
@@ -215,7 +216,8 @@ class BrohamerHorse:
         self.past_performances: list[BrohamerPastPerformance] = []
         if sfh.past_performances:
             for pp in sfh.past_performances:
-                if not pp.track_code or int(pp.date[:4]) < 2025:
+                if not pp.track_code or int(pp.date[:4]) < 2025 or pp.two_furlong_fraction == 0 \
+                        or pp.four_furlong_fraction == 0:
                     continue
                 self.past_performances.append(BrohamerPastPerformance(self.name, pp))
 
