@@ -220,6 +220,20 @@ class BrohamerHorse:
                         or pp.four_furlong_fraction == 0:
                     continue
                 self.past_performances.append(BrohamerPastPerformance(self.name, pp))
+        fr1s = [float(pp.fr1) for pp in self.past_performances]
+        fr2s = [float(pp.fr2) for pp in self.past_performances]
+        fr3s = [float(pp.fr3) for pp in self.past_performances]
+        eps = [float(pp.ep) for pp in self.past_performances]
+        sps = [float(pp.sp) for pp in self.past_performances]
+        aps = [float(pp.ap) for pp in self.past_performances]
+        es = [float(pp.energy) for pp in self.past_performances]
+        self.average_fr1 = sum(fr1s) / len(fr1s)
+        self.average_f2 = sum(fr2s) / len(fr2s)
+        self.average_fr3 = sum(fr3s) / len(fr3s)
+        self.average_ep = sum(eps) / len(eps)
+        self.average_sp = sum(sps) / len(sps)
+        self.average_ap = sum(aps) / len(aps)
+        self.average_energy = sum(es) / len(es)
 
     def __str__(self):
         ret = ''
