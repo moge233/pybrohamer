@@ -8,6 +8,7 @@ import os
 
 import matplotlib.pyplot as plt
 import numpy
+from pandas import DataFrame, ExcelWriter, concat
 from scipy.stats import norm
 
 from brispy.singlefile import SingleFile, SingleFileHorse, SingleFilePastPerformance, SingleFileRace, SingleFileRow
@@ -268,6 +269,47 @@ def separate_races(sf: SingleFile, skip_maidens=False) -> list[BrohamerRace | No
         assert ret[current_race_number - 1].horses is not None  # type: ignore
         ret[current_race_number - 1].horses.append(BrohamerHorse(row.horse))  # type: ignore
     return ret
+
+
+def create_dataframe_from_singlefile(single_file: SingleFile, skip_maidens=False) -> list[DataFrame | None]:
+    todays_races: list[BrohamerRace | None] = separate_races(single_file, skip_maidens=skip_maidens)
+    single_file_dfs: list[DataFrame | None] = []
+    for race in todays_races:
+        if race:
+            race_dfs: list[DataFrame] = []
+            for horse in race.horses:
+                pp_dfs: list[DataFrame] = []
+                for pp in horse.past_performances:
+                    if pp:
+                        pp_dfs.append(DataFrame([dict(vars(pp).items())]))
+                if pp_dfs:
+                    race_dfs.append(concat(pp_dfs, axis=0, ignore_index=True))
+            single_file_dfs.append(concat(race_dfs, axis=0, ignore_index=True))
+        else:
+            single_file_dfs.append(None)
+    return single_file_dfs
+
+
+def write_singlefile_to_excel(single_file: SingleFile, output_path: str, skip_maidens: bool = False):
+    dfs = create_dataframe_from_singlefile(single_file, skip_maidens=skip_maidens)
+    try:
+        with ExcelWriter(output_path, engine='openpyxl') as writer:
+            for i, df in enumerate(dfs):
+                if type(df) is DataFrame:
+                    df.to_excel(writer, sheet_name=f'Race {i + 1}', index=False)
+    except Exception as e:
+        print(e)
+
+
+def remove_todays_scratches(single_file: SingleFile, todays_scratches: list[str] | None = None) -> list[SingleFileRow]:
+    if not todays_scratches:
+        return single_file.rows
+    else:
+        todays_scratches = [scratch.casefold() for scratch in todays_scratches]
+    for row in single_file.rows:
+        if row.horse.name.casefold() in todays_scratches:
+            print(f'Removing a scratch: {row.horse.name}')
+    return [row for row in single_file.rows if row.horse.name.casefold() not in todays_scratches]
 
 
 def get_average_brohamer_value(pps: list[BrohamerPastPerformance], figure: BrohamerFigure):
