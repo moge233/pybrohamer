@@ -6,10 +6,8 @@ from enum import Enum
 import math
 import os
 
-import matplotlib.pyplot as plt
 import numpy
 from pandas import DataFrame, ExcelWriter, concat
-from scipy.stats import norm
 
 from brispy.singlefile import SingleFile, SingleFileHorse, SingleFilePastPerformance, SingleFileRace, SingleFileRow
 from horsedb2.variants import get_average_variants_db
@@ -220,20 +218,29 @@ class BrohamerHorse:
                         or pp.four_furlong_fraction == 0:
                     continue
                 self.past_performances.append(BrohamerPastPerformance(self.name, pp))
-        fr1s = [float(pp.fr1) for pp in self.past_performances]
-        fr2s = [float(pp.fr2) for pp in self.past_performances]
-        fr3s = [float(pp.fr3) for pp in self.past_performances]
-        eps = [float(pp.ep) for pp in self.past_performances]
-        sps = [float(pp.sp) for pp in self.past_performances]
-        aps = [float(pp.ap) for pp in self.past_performances]
-        es = [float(pp.energy) for pp in self.past_performances]
-        self.average_fr1 = sum(fr1s) / len(fr1s)
-        self.average_f2 = sum(fr2s) / len(fr2s)
-        self.average_fr3 = sum(fr3s) / len(fr3s)
-        self.average_ep = sum(eps) / len(eps)
-        self.average_sp = sum(sps) / len(sps)
-        self.average_ap = sum(aps) / len(aps)
-        self.average_energy = sum(es) / len(es)
+        if self.past_performances:
+            fr1s = [float(pp.fr1) for pp in self.past_performances]
+            fr2s = [float(pp.fr2) for pp in self.past_performances]
+            fr3s = [float(pp.fr3) for pp in self.past_performances]
+            eps = [float(pp.ep) for pp in self.past_performances]
+            sps = [float(pp.sp) for pp in self.past_performances]
+            aps = [float(pp.ap) for pp in self.past_performances]
+            es = [float(pp.energy) for pp in self.past_performances]
+            self.average_fr1 = round(sum(fr1s) / len(fr1s), 2)
+            self.average_fr2 = round(sum(fr2s) / len(fr2s), 2)
+            self.average_fr3 = round(sum(fr3s) / len(fr3s), 2)
+            self.average_ep = round(sum(eps) / len(eps), 2)
+            self.average_sp = round(sum(sps) / len(sps), 2)
+            self.average_ap = round(sum(aps) / len(aps), 2)
+            self.average_energy = round(sum(es) / len(es), 2)
+        else:
+            self.average_fr1 = 0
+            self.average_fr2 = 0
+            self.average_fr3 = 0
+            self.average_ep = 0
+            self.average_sp = 0
+            self.average_ap = 0
+            self.average_energy = 0
 
     def __str__(self):
         ret = ''
@@ -295,7 +302,12 @@ def create_dataframe_from_singlefile(single_file: SingleFile, skip_maidens=False
                 pp_dfs: list[DataFrame] = []
                 for pp in horse.past_performances:
                     if pp:
-                        pp_dfs.append(DataFrame([dict(vars(pp).items())]))
+                        pp_df = DataFrame([dict(vars(pp).items())])
+                        pp_df = pp_df[['name', 'track_code', 'distance', 'surface', 'all_weather', 'track_condition',
+                                       'finish_position', 'winner', 'track_variant', 'average_variant',
+                                       'bl1', 'bl2', 'bl3', 't1', 't2', 't3', 'fr1', 'fr2', 'fr3', 'ep',
+                                       'sp', 'ap', 'fx', 'energy']]
+                        pp_dfs.append(pp_df)
                 if pp_dfs:
                     race_dfs.append(concat(pp_dfs, axis=0, ignore_index=True))
             single_file_dfs.append(concat(race_dfs, axis=0, ignore_index=True))
@@ -728,32 +740,6 @@ def is_different_type(d1: float, d2: float) -> bool:
     return True
 
 
-def plot_pdfs(race_number: str, starters_dict: dict, figure: BrohamerFigure):
-    min = 1000.00
-    max = 0
-    for BrohamerRaces in starters_dict.values():
-        tmp_min = get_min_brohamer_value(BrohamerRaces, figure)
-        tmp_max = get_max_brohamer_value(BrohamerRaces, figure)
-        if tmp_min < min:
-            min = tmp_min
-        if tmp_max > max:
-            max = tmp_max
-    x = numpy.linspace(min - 3, max + 3)
-    for starter, BrohamerRaces in starters_dict.items():
-        if len(BrohamerRaces) < 4:
-            continue
-        mean = get_average_brohamer_value(BrohamerRaces[:4], figure)
-        stddev = get_stddev_brohamer_value(BrohamerRaces[:4], figure)
-        pdf = norm.pdf(x, loc=mean, scale=stddev)
-        plt.plot(x, pdf, label=f'{starter}')
-    plt.title(f'PDF of race {race_number}')
-    plt.xlabel('')
-    plt.ylabel('Value')
-    plt.legend()
-    plt.tight_layout()
-    plt.show()
-
-
 def to_csv(pp: BrohamerPastPerformance, output: str, mode: str = 'a', newline: str = ''):
     if mode not in ('a', 'w'):
         return None
@@ -779,5 +765,4 @@ __all__ = [
     'BrohamerRace',
     'separate_races',
     'to_csv',
-    'plot_pdfs',
 ]

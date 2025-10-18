@@ -11,9 +11,9 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "args": [
-                "C:\\Users\\mathe\\OneDrive\\Documents\\horses\\gulfstream\\pps\\2025\\data\\GPX1004.DRF",
-                "C:\\Users\\mathe\\OneDrive\\Documents\\horses\\gulfstream\\pps\\2025\\gpx1004.xlsx",
-                "--scratches=C. S. Vivace,Red River Rebel,Tap Gold,Rough Draft,Sultan The Great,Tape Runner,Flat Cap,Drill's Valentine,Smart Jenny,Megan Makin Money,Red Hot Spark,Denver's Alley,Lita,Tee At One,Dominican Pioneer"
+                "C:\\Users\\mathe\\OneDrive\\Documents\\horses\\gulfstream\\pps\\2025\\data\\GPX1018.DRF",
+                "C:\\Users\\mathe\\OneDrive\\Documents\\horses\\gulfstream\\pps\\2025\\gpx1018.xlsx",
+                "--scratches="
             ]
         },
     ]
